@@ -9,6 +9,26 @@ DATA_PATH = PROJECT_ROOT / "data" / "raw" / "lung_cancer_studies.json"
 with DATA_PATH.open("r", encoding="utf-8") as file:
     data = json.load(file)
 
+ids_to_inspect = {
+    "NCT00119470",  # Enrollment count present, type missing.
+    "NCT00103831",  # Completed, with several missing fields.
+}
+
+for study in data["studies"]:
+    protocol = study["protocolSection"]
+    nct_id = protocol["identificationModule"]["nctId"]
+
+    if nct_id in ids_to_inspect:
+        print(f"\nStudy: {nct_id}")
+
+        for module_name in ["statusModule", "designModule"]:
+            print(f"\n{module_name}:")
+            print(json.dumps(
+                protocol.get(module_name),
+                indent=2,
+                ensure_ascii=False,
+            ))
+
 def extract_study_summary(study):
     protocol = study["protocolSection"]
     identification = protocol["identificationModule"]
@@ -24,6 +44,11 @@ def extract_study_summary(study):
 
     start_date = start.get("date")
 
+    primary_completion = status.get("primaryCompletionDateStruct", {})
+
+    primary_completion_date = primary_completion.get("date")
+    primary_completion_date_type = primary_completion.get("type")
+
     completion = status.get("completionDateStruct", {})
 
     completion_date = completion.get("date")
@@ -36,6 +61,8 @@ def extract_study_summary(study):
         "study_type": design["studyType"],
         "enrollment_count": enrollment_count,
         "enrollment_type": enrollment_type,
+        "primary_completion_date": primary_completion_date,
+        "primary_completion_date_type": primary_completion_date_type,
         "start_date": start_date,
         "completion_date": completion_date,
         "completion_date_type": completion_date_type
@@ -49,10 +76,23 @@ for study in data["studies"]:
     summary = extract_study_summary(study)
     summaries.append(summary)
 
-for field in summaries[0]:
-    missing_count = sum(
-        summary[field] is None
-        for summary in summaries
-    )
+fields_to_review = [
+    "enrollment_count",
+    "enrollment_type",
+    "start_date",
+    "completion_date",
+    "completion_date_type",
+]
 
-    print(f"{field}: {missing_count} missing")
+for summary in summaries:
+    if summary["nct_id"] == "NCT00103831":
+        print(summary)
+
+def needs_completion_date_review(summary):
+    eligible_study_types = ["INTERVENTIONAL", "OBSERVATIONAL"]
+
+    return (
+        summary["study_type"] in eligible_study_types
+        and summary["overall_status"] == "COMPLETED"
+        and summary["completion_date"] is None
+    )
