@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from quality_rules import needs_completion_date_review
 
 # Locate the file relative to this script.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -88,11 +89,11 @@ for summary in summaries:
     if summary["nct_id"] == "NCT00103831":
         print(summary)
 
-def needs_completion_date_review(summary):
-    eligible_study_types = ["INTERVENTIONAL", "OBSERVATIONAL"]
+flagged_ids = [
+    summary["nct_id"]
+    for summary in summaries
+    if needs_completion_date_review(summary)
+]
 
-    return (
-        summary["study_type"] in eligible_study_types
-        and summary["overall_status"] == "COMPLETED"
-        and summary["completion_date"] is None
-    )
+print("Flagged studies:", len(flagged_ids))
+print(flagged_ids)
