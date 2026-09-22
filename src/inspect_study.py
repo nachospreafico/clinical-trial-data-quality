@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from quality_rules import needs_completion_date_review
+from quality_rules import needs_completion_date_review, build_completion_date_review_queue
 
 # Locate the file relative to this script.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -85,15 +85,11 @@ fields_to_review = [
     "completion_date_type",
 ]
 
-for summary in summaries:
-    if summary["nct_id"] == "NCT00103831":
-        print(summary)
+review_queue = build_completion_date_review_queue(summaries)
 
-flagged_ids = [
-    summary["nct_id"]
-    for summary in summaries
-    if needs_completion_date_review(summary)
-]
+OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "completion_date_review_queue.json"
 
-print("Flagged studies:", len(flagged_ids))
-print(flagged_ids)
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+with OUTPUT_PATH.open("w", encoding="utf-8") as file:
+    json.dump(review_queue, file, indent=2, ensure_ascii=False)
