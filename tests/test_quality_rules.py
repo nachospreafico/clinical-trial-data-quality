@@ -1,5 +1,5 @@
 import pytest
-from src.quality_rules import needs_completion_date_review, build_completion_date_review_queue, needs_enrollment_type_review
+from src.quality_rules import needs_completion_date_review, build_review_queue, needs_enrollment_type_review
 
 @pytest.mark.parametrize(
     "study_type, status, completion_date, expected",
@@ -23,7 +23,7 @@ def test_function_correctly_classifies_need_of_completion_date_review(study_type
 
 def test_function_correctly_outputs_an_empty_list_when_given_an_empty_list():
     sample_input = []
-    func_output = build_completion_date_review_queue(sample_input)
+    func_output = build_review_queue(sample_input)
     assert func_output == []
 
 def test_function_correctly_outputs_an_empty_list_when_all_non_qualifying_studies():
@@ -33,21 +33,27 @@ def test_function_correctly_outputs_an_empty_list_when_all_non_qualifying_studie
             "study_type": "INTERVENTIONAL",
             "overall_status": "COMPLETED",
             "completion_date": "2020-06",
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL"
         },
         {
             "nct_id": "TEST002",
             "study_type": "OBSERVATIONAL",
             "overall_status": "RECRUITING",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL"
         },
         {
             "nct_id": "TEST003",
             "study_type": "EXPANDED_ACCESS",
             "overall_status": "APPROVED_FOR_MARKETING",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL"
         },
     ]
-    func_output = build_completion_date_review_queue(sample_input)
+    func_output = build_review_queue(sample_input)
     assert func_output == []
 
 def test_function_correctly_outputs_when_given_a_mix_of_qualified_and_non_qualified_studies_are_passed():
@@ -57,18 +63,24 @@ def test_function_correctly_outputs_when_given_a_mix_of_qualified_and_non_qualif
             "study_type": "INTERVENTIONAL",
             "overall_status": "COMPLETED",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL"
         },
         {
             "nct_id": "TEST002",
             "study_type": "OBSERVATIONAL",
             "overall_status": "RECRUITING",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL"
         },
         {
             "nct_id": "TEST003",
             "study_type": "OBSERVATIONAL",
             "overall_status": "COMPLETED",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL"
         },
     ]
     expected_output = [
@@ -89,50 +101,63 @@ def test_function_correctly_outputs_when_given_a_mix_of_qualified_and_non_qualif
             "review_status": "PENDING"
         }
     ]
-    func_output = build_completion_date_review_queue(sample_input)
+    func_output = build_review_queue(sample_input)
     assert func_output == expected_output
 
+def test_function_does_not_alter_original_input_list():
     sample_input = [
         {
             "nct_id": "TEST001",
             "study_type": "INTERVENTIONAL",
-                "overall_status": "COMPLETED",
-                "completion_date": None,
+            "overall_status": "COMPLETED",
+            "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL",
         },
         {
             "nct_id": "TEST002",
             "study_type": "OBSERVATIONAL",
             "overall_status": "RECRUITING",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL",
         },
         {
             "nct_id": "TEST003",
             "study_type": "OBSERVATIONAL",
             "overall_status": "COMPLETED",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL",
         },
     ]
     expected_input = [
         {
             "nct_id": "TEST001",
             "study_type": "INTERVENTIONAL",
-                "overall_status": "COMPLETED",
-                "completion_date": None,
+            "overall_status": "COMPLETED",
+            "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL",
         },
         {
             "nct_id": "TEST002",
             "study_type": "OBSERVATIONAL",
             "overall_status": "RECRUITING",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL",
         },
         {
             "nct_id": "TEST003",
             "study_type": "OBSERVATIONAL",
             "overall_status": "COMPLETED",
             "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": "ACTUAL",
         },
     ]
-    build_completion_date_review_queue(sample_input)
+    build_review_queue(sample_input)
     assert sample_input == expected_input
 
 @pytest.mark.parametrize(
@@ -156,3 +181,27 @@ def test_function_correctly_classifies_need_of_enrollment_type_review(study_type
     }
     func_output = needs_enrollment_type_review(test_dict)
     assert func_output == expected
+
+def test_function_correctly_outputs_when_passed_a_DQ002_qualifying_summary():
+    sample_input = [
+        {
+            "nct_id": "TEST001",
+            "study_type": "INTERVENTIONAL",
+            "overall_status": "COMPLETED",
+            "completion_date": "2026-09-01",
+            "enrollment_count": 40,
+            "enrollment_type": None,
+        }
+    ]
+    expected_output = [
+        {
+            "nct_id": "TEST001",
+            "rule_id": "DQ002",
+            "field": "enrollment_type",
+            "observed_value": None,
+            "reason": "Enrollment count is present but enrollment type is missing.",
+            "review_status": "PENDING"
+        }
+    ]
+    func_output = build_review_queue(sample_input)
+    assert func_output == expected_output
