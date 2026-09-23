@@ -1,5 +1,5 @@
 import pytest
-from src.quality_rules import needs_completion_date_review, build_completion_date_review_queue
+from src.quality_rules import needs_completion_date_review, build_completion_date_review_queue, needs_enrollment_type_review
 
 @pytest.mark.parametrize(
     "study_type, status, completion_date, expected",
@@ -92,7 +92,6 @@ def test_function_correctly_outputs_when_given_a_mix_of_qualified_and_non_qualif
     func_output = build_completion_date_review_queue(sample_input)
     assert func_output == expected_output
 
-def test_function_does_not_alter_original_input_list():
     sample_input = [
         {
             "nct_id": "TEST001",
@@ -135,3 +134,25 @@ def test_function_does_not_alter_original_input_list():
     ]
     build_completion_date_review_queue(sample_input)
     assert sample_input == expected_input
+
+@pytest.mark.parametrize(
+        "study_type, enrollment_count, enrollment_type, expected",
+        [
+            ("INTERVENTIONAL", 40, None, True),
+            ("OBSERVATIONAL",	40,	None,	True),
+            ("INTERVENTIONAL",	0,	None,	True),
+            ("INTERVENTIONAL",	40,	"ACTUAL",	False),
+            ("INTERVENTIONAL",	40,	"ESTIMATED",	False),
+            ("INTERVENTIONAL",	None,	None,	False),
+            ("INTERVENTIONAL",	None,	"ACTUAL",	False),
+            ("EXPANDED_ACCESS",	40,	None,	False),
+        ]
+)
+def test_function_correctly_classifies_need_of_enrollment_type_review(study_type, enrollment_count, enrollment_type, expected):
+    test_dict = {
+        "study_type": study_type,
+        "enrollment_count": enrollment_count,
+        "enrollment_type": enrollment_type
+    }
+    func_output = needs_enrollment_type_review(test_dict)
+    assert func_output == expected

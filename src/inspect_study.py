@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
-from quality_rules import needs_completion_date_review, build_completion_date_review_queue
-
+from quality_rules import build_review_queue
 # Locate the file relative to this script.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = PROJECT_ROOT / "data" / "raw" / "lung_cancer_studies.json"
@@ -85,11 +84,11 @@ fields_to_review = [
     "completion_date_type",
 ]
 
-review_queue = build_completion_date_review_queue(summaries)
+review_queue = build_review_queue(summaries)
 
-OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "completion_date_review_queue.json"
+# OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "completion_date_review_queue.json"
 
-OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+# OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-with OUTPUT_PATH.open("w", encoding="utf-8") as file:
-    json.dump(review_queue, file, indent=2, ensure_ascii=False)
+# with OUTPUT_PATH.open("w", encoding="utf-8") as file:
+#     json.dump(review_queue, file, indent=2, ensure_ascii=False)
