@@ -1,5 +1,13 @@
 [
   {
+    "nct_id": "NCT00119470",
+    "rule_id": "DQ002",
+    "field": "enrollment_type",
+    "observed_value": null,
+    "reason": "Enrollment count is present but enrollment type is missing.",
+    "review_status": "PENDING"
+  },
+  {
     "nct_id": "NCT00103831",
     "rule_id": "DQ001",
     "field": "completion_date",

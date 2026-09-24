@@ -56,7 +56,7 @@ def test_function_correctly_outputs_an_empty_list_when_all_non_qualifying_studie
     func_output = build_review_queue(sample_input)
     assert func_output == []
 
-def test_function_correctly_outputs_when_given_a_mix_of_qualified_and_non_qualified_studies_are_passed():
+def test_function_correctly_outputs_when_given_a_mix_of_qualified_and_non_qualified_studies():
     sample_input = [
         {
             "nct_id": "TEST001",
@@ -194,6 +194,38 @@ def test_function_correctly_outputs_when_passed_a_DQ002_qualifying_summary():
         }
     ]
     expected_output = [
+        {
+            "nct_id": "TEST001",
+            "rule_id": "DQ002",
+            "field": "enrollment_type",
+            "observed_value": None,
+            "reason": "Enrollment count is present but enrollment type is missing.",
+            "review_status": "PENDING"
+        }
+    ]
+    func_output = build_review_queue(sample_input)
+    assert func_output == expected_output
+
+def test_build_review_queue_returns_both_findings_for_one_study():
+    sample_input = [
+        {
+            "nct_id": "TEST001",
+            "study_type": "OBSERVATIONAL",
+            "overall_status": "COMPLETED",
+            "completion_date": None,
+            "enrollment_count": 40,
+            "enrollment_type": None
+        }
+    ]
+    expected_output = [
+        {
+            "nct_id": "TEST001",
+            "rule_id": "DQ001",
+            "field": "completion_date",
+            "observed_value": None,
+            "reason": "Completed study has no reported completion date.",
+            "review_status": "PENDING"
+        },
         {
             "nct_id": "TEST001",
             "rule_id": "DQ002",
