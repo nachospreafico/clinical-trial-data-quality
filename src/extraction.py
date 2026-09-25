@@ -5,20 +5,31 @@ def extract_study_summary(study):
     design = protocol["designModule"]
 
     enrollment = design.get("enrollmentInfo", {})
+    if enrollment is None:
+        enrollment = {}
 
     enrollment_count = enrollment.get("count")
     enrollment_type = enrollment.get("type")
 
     start = status.get("startDateStruct", {})
 
+    if start is None:
+        start = {}
+
     start_date = start.get("date")
 
     primary_completion = status.get("primaryCompletionDateStruct", {})
+
+    if primary_completion is None:
+        primary_completion = {}
 
     primary_completion_date = primary_completion.get("date")
     primary_completion_date_type = primary_completion.get("type")
 
     completion = status.get("completionDateStruct", {})
+
+    if completion is None:
+        completion = {}
 
     completion_date = completion.get("date")
     completion_date_type = completion.get("type")
