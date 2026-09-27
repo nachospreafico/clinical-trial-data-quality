@@ -11,29 +11,32 @@ DATA_PATH = PROJECT_ROOT / "data" / "raw" / "lung_cancer_studies.json"
 with DATA_PATH.open("r", encoding="utf-8") as file:
     data = json.load(file)
 
+# Initialize an empty list to collect the summaries
 summaries = []
 
+# Loop through the studies, extract the summaries and append to the summaries list
 for study in data["studies"]:
     summary = extract_study_summary(study)
     summaries.append(summary)
 
-fields_to_review = [
-    "enrollment_count",
-    "enrollment_type",
-    "start_date",
-    "completion_date",
-    "completion_date_type",
-]
-
+# Build the list of flagged (DQ001 and/or DQ002) for review
 review_queue = build_review_queue(summaries)
 
-OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "review_queue.json"
+OUTPUT_PATH = PROJECT_ROOT / "data" / "processed"
 
-OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+REVIEW_QUEUE_PATH = OUTPUT_PATH / "review_queue.json"
 
-with OUTPUT_PATH.open("w", encoding="utf-8") as file:
+SUMMARIES_PATH = OUTPUT_PATH / "study_summaries.json"
+
+OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
+
+with REVIEW_QUEUE_PATH.open("w", encoding="utf-8") as file:
     json.dump(review_queue, file, indent=2, ensure_ascii=False)
+
+with SUMMARIES_PATH.open("w", encoding="utf-8") as file:
+    json.dump(summaries, file, indent=2, ensure_ascii=False)
 
 print(f"Studies processed: {len(summaries)}")
 print(f"Findings requiring review: {len(review_queue)}")
-print(f"Review queue saved to: {OUTPUT_PATH}")
+print(f"Review queue saved to: {REVIEW_QUEUE_PATH}")
+print(f"Study summaries saved to: {SUMMARIES_PATH}")
