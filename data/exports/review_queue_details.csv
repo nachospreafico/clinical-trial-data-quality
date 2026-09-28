@@ -1,0 +1,6 @@
+nct_id,brief_title,study_type,overall_status,rule_id,field,observed_value,reason,review_status
+NCT00119470,EUS-FNA in the Pre-Operative Evaluation of Patients With Lung Cancer,INTERVENTIONAL,COMPLETED,DQ002,enrollment_type,,Enrollment count is present but enrollment type is missing.,PENDING
+NCT00103831,Oral Taxane in Combination With Pemetrexed (Alimta) in Patients With Recurrent Non-Small Cell Lung Cancer,INTERVENTIONAL,COMPLETED,DQ001,completion_date,,Completed study has no reported completion date.,PENDING
+NCT00005666,Utility of Anatometabolic Imaging for Radiation Treatment Planning for Lung Cancer,INTERVENTIONAL,COMPLETED,DQ001,completion_date,,Completed study has no reported completion date.,PENDING
+NCT00180154,Tumor Metabolism of Lung Cancer in Patients Who Underwent Percutaneous Radiation Measured With F-18-FDG-PET,OBSERVATIONAL,COMPLETED,DQ001,completion_date,,Completed study has no reported completion date.,PENDING
+NCT00004199,Prinomastat and Combination Chemotherapy in Treating Patients With Metastatic or Recurrent Non-small Cell Lung Cancer,INTERVENTIONAL,COMPLETED,DQ001,completion_date,,Completed study has no reported completion date.,PENDING
