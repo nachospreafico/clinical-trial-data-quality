@@ -3,5 +3,7 @@
 __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
+
+# Generated data
 data/raw/
 data/clinical_trials.duckdb*
